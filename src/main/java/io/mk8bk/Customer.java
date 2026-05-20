@@ -28,11 +28,7 @@ public class Customer {
     }
 
     Customer(String firstname, String surname){
-        this.ID = IDCounter;
-        IDCounter++;
-        this.surname = surname;
-        this.firstname = firstname;
-        this.plan = CustomerPlan.NORMAL;
+        this(firstname, surname, CustomerPlan.NORMAL);
     }
 
     @Override
