@@ -4,10 +4,17 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class SuperMarketCheckoutSystem {
-    static SessionController session = new SessionController();
+    static final UserBase userBase = new UserBase();
+    static final UserSession userSession = new UserSession(userBase);
+    static final Inventory inventory = new Inventory();
 
     public static void main(String[] args) {
-        loadData();
+        try {
+            userBase.registerManager("ceo", "123456789");
+        } catch (UserBase.UserAlreadyRegisteredException e) {
+            // dead branch
+            throw new RuntimeException(e);
+        }
         handleCLI();
     }
 
@@ -45,13 +52,21 @@ public class SuperMarketCheckoutSystem {
                 System.out.println("Command `login` takes exactly two arguments: <username> <password>.");
                 return;
             }
-            session.login(arguments[0], arguments[1]);
+            handleLogin(arguments[0], arguments[1]);
         } else if ("logout".equals(command)) {
             if (arguments.length != 0) {
                 System.out.println("Command `logout` takes no arguments.");
                 return;
             }
-            session.logout();
+            handleLogout();
+        } else if ("registerCashier".equals(command)) {
+            if (arguments.length != 4) {
+                System.out.println(
+                        "Command `registerCashier` takes exactly four arguments: <firstname> <lastname> <username> <password>"
+                );
+                return;
+            }
+            handleRegisterCashierCommand(arguments[0], arguments[1], arguments[2], arguments[3]);
         } else if ("registerCustomer".equals(command)) {
             if (arguments.length != 5) {
                 System.out.println(
@@ -59,9 +74,14 @@ public class SuperMarketCheckoutSystem {
                 );
                 return;
             }
-            session.registerCustomer(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+            handleRegisterCustomerCommand(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+        } else if ("setup".equals(command)) {
+            if (arguments.length != 0) {
+                System.out.println(
+                        "Command `setup` takes no arguments."
+                );
+            }
         }else{
-
             System.out.println("Command `"+command+"` is invalid, type `help` for available commands.");
         }
         //setup
@@ -80,6 +100,62 @@ public class SuperMarketCheckoutSystem {
         //showInventory
         //showRevenue
         //runTest <testScenario-file>
+    }
+
+    private static void handleRegisterCashierCommand(String firstname, String lastname, String username, String password) {
+         if(!userSession.isUserLoggedIn()){
+             System.out.println("No manager logged in. Can't register Cashier.");
+             return;
+         }
+         if(userSession.getLoggedInUser().getClass()!=Manager.class){
+             System.out.println("Only a Manager can register a new cashier.");
+             return;
+         }
+        try {
+            userBase.registerCashier(firstname, lastname, username, password);
+            System.out.println("Cashier `"+username+"` successfully registered.");
+        } catch (UserBase.UserAlreadyRegisteredException e) {
+            System.out.println("A user with the username `"+username+"` is already registered.");
+        }
+    }
+
+    private static void handleRegisterCustomerCommand(String firstname, String lastname, String username, String address, String password) {
+        if(!userSession.isUserLoggedIn()){
+            System.out.println("No cashier or manager logged in. Can't register customer");
+            return;
+        }
+    }
+
+
+    private static void handleLogout() {
+        try {
+            userSession.logout();
+            System.out.println("Logout successfull.");
+        } catch (UserSession.NoUserLoggedInException e) {
+            System.out.println("No user logged in, can't logout.");
+        }
+    }
+
+    private static void handleLogin(String username, String password) {
+        try {
+            userSession.login(username, password);
+            User u = userSession.getLoggedInUser();
+            if(u instanceof Cashier c){
+                System.out.println("Cashier `"+username+"` logged in successfully.");
+            }else if(u instanceof Manager m){
+                System.out.println("Manager `"+username+"` logged in successfully.");
+            }else{
+                // dead branch, lookup sealed classes
+                // TODO: lookup more details on sealed classes to assert correct behavior
+               throw new RuntimeException("Unknown user type.");
+            }
+        } catch (UserSession.UserAlreadyLoggedInException e) {
+            System.out.println("A user is already logged in ("+userSession.getLoggedInUser().getUsername()+"). Logout first.");
+        } catch (UserBase.NoSuchUserException e) {
+            System.out.println("No user with username `"+username+"` is registered. Register first.");
+        } catch (UserSession.InvalidPasswordException e) {
+            System.out.println("Invalid password for user `"+username+"`. Try again.");
+        }
     }
 
 
@@ -107,10 +183,4 @@ public class SuperMarketCheckoutSystem {
         System.out.println("\tquit");
     }
 
-    private static void loadData() {
-        session.registerCustomer("ceo", "ceo", "ceo",
-                "sillicon valley", "123456789");
-        if(false)
-            System.out.println("[COULD NOT INITIALIZE DATA]");
-    }
 }
