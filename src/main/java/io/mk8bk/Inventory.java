@@ -1,6 +1,7 @@
 package io.mk8bk;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class Inventory {
     private final HashMap<String, Item> items;
@@ -17,6 +18,11 @@ public class Inventory {
         items.put(i.getName(), i);
         quantities.put(i.getName(), initialStock);
     }
+
+    public boolean hasItem(String itemName){
+        return items.containsKey(itemName);
+    }
+
     public Item getItem(String itemName) throws NoSuchItemException {
         if(!items.containsKey(itemName))
             throw new NoSuchItemException(itemName);
@@ -34,6 +40,10 @@ public class Inventory {
         if(quantity<0)
             throw new NegativeRestockingQuantity();
         quantities.put(itemName, quantities.get(itemName)+quantity);
+    }
+
+    public Set<String> getAllItemNames(){
+        return items.keySet();
     }
 
     public void destock(String itemName, int consumedQuantity) throws NoSuchItemException, NegativeDestockingQuantity, NegativeStockQuantity {

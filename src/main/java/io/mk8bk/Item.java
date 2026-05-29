@@ -5,26 +5,36 @@ import java.util.Objects;
 public class Item {
     private final String name;
     private final ItemCategory itemCategory;
-    private final int unitPriceCentimes;
-    private final int weightPerUnit;
+    private final int unitPriceInCentimes;
+    private final int weightPerUnitInGrams;
 
-    public Item(String name, String categoryName, int unitPriceCentimes, int weightPerUnit) {
+    @Override
+    public String toString() {
+        return "Item{" +
+                "name='" + name + '\'' +
+                ", itemCategory='" + itemCategory.categoryName() +
+                "', unitPriceInCentimes=" + unitPriceInCentimes +
+                ", weightPerUnitInGrams=" + weightPerUnitInGrams +
+                '}';
+    }
+
+    public Item(String name, ItemCategory category, int unitPriceInCentimes, int weightPerUnitInGrams) {
         this.name = name;
-        this.unitPriceCentimes = unitPriceCentimes;
-        this.weightPerUnit = weightPerUnit;
-        itemCategory = new ItemCategory(categoryName);
+        this.unitPriceInCentimes = unitPriceInCentimes;
+        this.weightPerUnitInGrams = weightPerUnitInGrams;
+        itemCategory = category;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return unitPriceCentimes == item.unitPriceCentimes && weightPerUnit == item.weightPerUnit && Objects.equals(name, item.name) && Objects.equals(itemCategory, item.itemCategory);
+        return unitPriceInCentimes == item.unitPriceInCentimes && weightPerUnitInGrams == item.weightPerUnitInGrams && Objects.equals(name, item.name) && Objects.equals(itemCategory, item.itemCategory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, itemCategory, unitPriceCentimes, weightPerUnit);
+        return Objects.hash(name, itemCategory, unitPriceInCentimes, weightPerUnitInGrams);
     }
 
     public String getName() {
@@ -35,11 +45,11 @@ public class Item {
         return itemCategory;
     }
 
-    public int getUnitPriceCentimes() {
-        return unitPriceCentimes;
+    public int getUnitPriceInCentimes() {
+        return unitPriceInCentimes;
     }
 
-    public int getWeightPerUnit() {
-        return weightPerUnit;
+    public int getWeightPerUnitInGrams() {
+        return weightPerUnitInGrams;
     }
 }

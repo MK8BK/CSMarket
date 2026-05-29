@@ -8,6 +8,12 @@ public class UserSession {
     public boolean isUserLoggedIn() {
         return userLoggedIn;
     }
+    public boolean isManagerLoggedIn(){
+        return isUserLoggedIn() && Objects.equals(loggedInUser.getClass(),Manager.class);
+    }
+    public boolean isCashierLoggedIn(){
+        return isUserLoggedIn() && Objects.equals(loggedInUser.getClass(),Cashier.class);
+    }
 
     private boolean userLoggedIn;
     private final UserBase userBase;
