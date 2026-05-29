@@ -8,6 +8,13 @@ public class Item {
     private final int unitPriceInCentimes;
     private final int weightPerUnitInGrams;
 
+    public Item(String name, ItemCategory category, int unitPriceInCentimes, int weightPerUnitInGrams) {
+        this.name = name;
+        this.unitPriceInCentimes = unitPriceInCentimes;
+        this.weightPerUnitInGrams = weightPerUnitInGrams;
+        itemCategory = category;
+    }
+
     @Override
     public String toString() {
         return "Item{" +
@@ -16,13 +23,6 @@ public class Item {
                 "', unitPriceInCentimes=" + unitPriceInCentimes +
                 ", weightPerUnitInGrams=" + weightPerUnitInGrams +
                 '}';
-    }
-
-    public Item(String name, ItemCategory category, int unitPriceInCentimes, int weightPerUnitInGrams) {
-        this.name = name;
-        this.unitPriceInCentimes = unitPriceInCentimes;
-        this.weightPerUnitInGrams = weightPerUnitInGrams;
-        itemCategory = category;
     }
 
     @Override

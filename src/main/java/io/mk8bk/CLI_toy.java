@@ -1,13 +1,13 @@
 package io.mk8bk;
 
-import java.util.Scanner;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class CLI_toy {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String input;
-        
+
         System.out.println("This is a  Command Line Interface");
         System.out.println("Available commands:");
         System.out.println("  HELP - Show this help message");
@@ -15,25 +15,25 @@ public class CLI_toy {
         System.out.println("  CALC [operation] [num1] [num2] - Perform calculation");
         System.out.println("  STOP - Exit the program");
         System.out.println("Enter your commands below:");
-        
+
         while (true) {
             System.out.print("> ");
             input = scanner.nextLine().trim();
-            
+
             if (input.equalsIgnoreCase("STOP")) {
                 System.out.println("Exiting the program...");
                 break;
             }
-            
+
             if (input.isEmpty()) {
                 continue;
             }
-            
+
             // Split input into command and arguments
             String[] parts = input.split("\\s+");
             String command = parts[0].toUpperCase();
             String[] arguments = Arrays.copyOfRange(parts, 1, parts.length);
-            
+
             switch (command) {
                 case "HELP":
                     printHelp();
@@ -49,10 +49,10 @@ public class CLI_toy {
                     System.out.println("Type HELP for available commands");
             }
         }
-        
+
         scanner.close();
     }
-    
+
     private static void printHelp() {
         System.out.println("Available commands:");
         System.out.println("  HELP - Show this help message");
@@ -60,7 +60,7 @@ public class CLI_toy {
         System.out.println("  CALC [add|sub|mul|div] [num1] [num2] - Perform calculation");
         System.out.println("  STOP - Exit the program");
     }
-    
+
     private static void handleGreet(String[] args) {
         if (args.length == 0) {
             System.out.println("Hello, World!");
@@ -68,19 +68,19 @@ public class CLI_toy {
             System.out.println("Hello, " + String.join(" ", args) + "!");
         }
     }
-    
+
     private static void handleCalc(String[] args) {
         if (args.length != 3) {
             System.out.println("Usage: CALC [add|sub|mul|div] [num1] [num2]");
             return;
         }
-        
+
         try {
             String operation = args[0].toLowerCase();
             double num1 = Double.parseDouble(args[1]);
             double num2 = Double.parseDouble(args[2]);
             double result;
-            
+
             switch (operation) {
                 case "add":
                     result = num1 + num2;
@@ -102,7 +102,7 @@ public class CLI_toy {
                     System.out.println("Invalid operation: " + operation);
                     return;
             }
-            
+
             System.out.println("Result: " + result);
         } catch (NumberFormatException e) {
             System.out.println("Error: Invalid number format");

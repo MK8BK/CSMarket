@@ -1,10 +1,12 @@
 package io.mk8bk;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class SuperMarketCheckoutSystem {
     static final UserBase userBase = new UserBase();
     static final UserSession userSession = new UserSession(userBase);
+    static final CustomerBase customerBase = new CustomerBase();
     static final Inventory inventory = new Inventory();
     static final CategoryRepository categories = new CategoryRepository();
 
@@ -46,23 +48,23 @@ public class SuperMarketCheckoutSystem {
     }
 
     private static void handleCommand(String command, String[] arguments) {
-        if(CommandUtils.isInvalidCommand(command)){
-            System.out.println("Command `"+command+"` is invalid, type `help` for available commands.");
+        if (CommandUtils.isInvalidCommand(command)) {
+            System.out.println("Command `" + command + "` is invalid, type `help` for available commands.");
             return;
         }
-        if(userSession.isManagerLoggedIn()){
-            if(!CommandUtils.isManagerCompatible(command)){
-                System.out.println("Command `"+command+"` is invalid for the current logged in user (manager).");
+        if (userSession.isManagerLoggedIn()) {
+            if (!CommandUtils.isManagerCompatible(command)) {
+                System.out.println("Command `" + command + "` is invalid for the current logged in user (manager).");
                 return;
             }
-        }else if(userSession.isCashierLoggedIn()){
-            if(!CommandUtils.isCashierCompatible(command)){
-                System.out.println("Command `"+command+"` is invalid for the current logged in user (cashier).");
+        } else if (userSession.isCashierLoggedIn()) {
+            if (!CommandUtils.isCashierCompatible(command)) {
+                System.out.println("Command `" + command + "` is invalid for the current logged in user (cashier).");
                 return;
             }
-        }else{ // no user logged in
-            if(!CommandUtils.isLoggedOutCompatible(command)){
-                System.out.println("Command `"+command+"` is invalid for the current user (not logged in).");
+        } else { // no user logged in
+            if (!CommandUtils.isLoggedOutCompatible(command)) {
+                System.out.println("Command `" + command + "` is invalid for the current user (not logged in).");
                 return;
             }
         }
@@ -79,7 +81,7 @@ public class SuperMarketCheckoutSystem {
             }
             handleLogout();
         } else if ("registerCashier".equals(command)) {
-            if(userSession.getLoggedInUser().getClass()!=Manager.class){
+            if (userSession.getLoggedInUser().getClass() != Manager.class) {
                 System.out.println("Only a Manager can register a new cashier.");
                 return;
             }
@@ -97,36 +99,36 @@ public class SuperMarketCheckoutSystem {
                 );
                 return;
             }
-            try{
+            try {
                 int initialStock = Integer.parseInt(arguments[4]);
                 int weight = Integer.parseInt(arguments[3]);
                 int unitPrice = Integer.parseInt(arguments[2]);
                 handleAddItem(arguments[0], arguments[1], unitPrice, weight, initialStock);
-            }catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 System.out.println("Arguments <unitPrice> <weight> <initialStock> should be integers (centimes).");
             }
 
         } else if ("showInventory".equals(command)) {
-            if(arguments.length!=0){
+            if (arguments.length != 0) {
                 System.out.println("Command `showInventory` takes no arguments");
                 return;
             }
             handleShowInventory();
         } else if ("restock".equals(command)) {
-            if(arguments.length!=2){
+            if (arguments.length != 2) {
                 System.out.println("Command `restock` takes exactly two arguments: <itemName> <quantity>");
                 return;
             }
-            try{
+            try {
                 int quantity = Integer.parseInt(arguments[1]);
                 handleRestock(arguments[0], quantity);
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 System.out.println("Argument <quantity> should be an integer.");
             }
         } else if ("registerCustomer".equals(command)) {
             if (arguments.length != 5) {
                 System.out.println(
-                 "Command `registerCustomer` takes exactly five arguments: <firstname> <lastname> <username> <address> <password>"
+                        "Command `registerCustomer` takes exactly five arguments: <firstname> <lastname> <username> <address> <password>"
                 );
                 return;
             }
@@ -140,43 +142,21 @@ public class SuperMarketCheckoutSystem {
         }
     }
 
-
-
-    // "login <username> <password>"
-    // "logout"
-    // "setup"
-    // "registerCashier <firstname> <lastname> <username> <password>"
-    // "registerCustomer <firstname> <lastname> <username> <address> <password>"
-    // "addItem <itemName> <categoryName> <unitPrice> <weight> <initialStock>"
-    // "restock <itemName> <quantity>"
-    // "setCategoryDiscount <categoryName> <discountPercent>"
-    // "subscribeToPlan <planName>"
-    // "startCheckout <customerUsername>"
-    // "scanItem <itemName> <quantity>"
-    // "computeBill"
-    // "requestDelivery <address>"
-    // "pay <cardNumber> <pin>"
-    // "simulatePayment <outcome>"
-    // "showInventory"
-    // "showRevenue"
-    // "runTest <testScenario-file>"
-    // "help"
-    // "quit"
-
     private static void handleRestock(String itemName, int quantity) {
         try {
             inventory.restock(itemName, quantity);
         } catch (Inventory.NoSuchItemException e) {
-            System.out.println("Can't restock item `"+itemName+"`, not registered.");
+            System.out.println("Can't restock item `" + itemName + "`, not registered.");
         } catch (Inventory.NegativeRestockingQuantity e) {
-            System.out.println("Cannot restock with negative value: "+quantity+".");
+            System.out.println("Cannot restock with negative value: " + quantity + ".");
         }
     }
+
     private static void handleShowInventory() {
         System.out.println("Inventory");
-        for(String itemName: inventory.getAllItemNames()){
+        for (String itemName : inventory.getAllItemNames()) {
             try {
-                System.out.println("\t\t"+inventory.getItem(itemName)+"\t\t"+inventory.getItemStock(itemName));
+                System.out.println("\t\t" + inventory.getItem(itemName) + "\t\t" + inventory.getItemStock(itemName));
             } catch (Inventory.NoSuchItemException e) {
                 // dead branch
             }
@@ -184,18 +164,18 @@ public class SuperMarketCheckoutSystem {
     }
 
     private static void handleAddItem(String itemName, String categoryName, int unitPrice, int weight, int initialStock) {
-        if(inventory.hasItem(itemName)){
-            System.out.println("Item `"+itemName+"` is already registered in the inventory.");
+        if (inventory.hasItem(itemName)) {
+            System.out.println("Item `" + itemName + "` is already registered in the inventory.");
             return;
         }
         try {
-            if(!categories.hasCategory(categoryName)){
+            if (!categories.hasCategory(categoryName)) {
                 categories.addCategory(categoryName);
             }
             ItemCategory category = categories.getCategory(categoryName);
             Item i = new Item(itemName, category, unitPrice, weight);
             inventory.addItem(i, initialStock);
-            System.out.println("Item `"+i.getName()+"` added to inventory.");
+            System.out.println("Item `" + i.getName() + "` added to inventory.");
         } catch (CategoryRepository.NoSuchCategoryException | CategoryRepository.CategoryAlreadyRegisteredException |
                  Inventory.ItemAlreadyPresentException e) {
             // dead branches
@@ -205,13 +185,19 @@ public class SuperMarketCheckoutSystem {
     private static void handleRegisterCashierCommand(String firstname, String lastname, String username, String password) {
         try {
             userBase.registerCashier(firstname, lastname, username, password);
-            System.out.println("Cashier `"+username+"` successfully registered.");
+            System.out.println("Cashier `" + username + "` successfully registered.");
         } catch (UserBase.UserAlreadyRegisteredException e) {
-            System.out.println("A user with the username `"+username+"` is already registered.");
+            System.out.println("A user with the username `" + username + "` is already registered.");
         }
     }
 
     private static void handleRegisterCustomerCommand(String firstname, String lastname, String username, String address, String password) {
+        try {
+            customerBase.registerCustomer(firstname, lastname, username, address, password);
+            System.out.println("Customer `" + username + "` registered successfully");
+        } catch (CustomerBase.CustomerAlreadyRegisteredException e) {
+            System.out.println("Customer with username `" + username + "` is already registered.");
+        }
     }
 
 
@@ -229,22 +215,22 @@ public class SuperMarketCheckoutSystem {
         try {
             userSession.login(username, password);
             User u = userSession.getLoggedInUser();
-            if(u instanceof Cashier c){
-                System.out.println("Cashier `"+username+"` logged in successfully.");
-            }else if(u instanceof Manager m){
-                System.out.println("Manager `"+username+"` logged in successfully.");
-            }else{
+            if (u instanceof Cashier c) {
+                System.out.println("Cashier `" + username + "` logged in successfully.");
+            } else if (u instanceof Manager m) {
+                System.out.println("Manager `" + username + "` logged in successfully.");
+            } else {
                 // dead branch, lookup sealed classes
                 // TODO: lookup more details on sealed classes to assert correct behavior
-               throw new RuntimeException("Unknown user type.");
+                throw new RuntimeException("Unknown user type.");
             }
-        // dead branches below, login was approved before
+            // dead branches below, login was approved before
         } catch (UserSession.UserAlreadyLoggedInException e) {
-            System.out.println("A user is already logged in ("+userSession.getLoggedInUser().getUsername()+"). Logout first.");
+            System.out.println("A user is already logged in (" + userSession.getLoggedInUser().getUsername() + "). Logout first.");
         } catch (UserBase.NoSuchUserException e) {
-            System.out.println("No user with username `"+username+"` is registered. Register first.");
+            System.out.println("No user with username `" + username + "` is registered. Register first.");
         } catch (UserSession.InvalidPasswordException e) {
-            System.out.println("Invalid password for user `"+username+"`. Try again.");
+            System.out.println("Invalid password for user `" + username + "`. Try again.");
         }
     }
 
@@ -255,7 +241,7 @@ public class SuperMarketCheckoutSystem {
         System.out.println("\tlogout"); // done
         System.out.println("\tsetup");
         System.out.println("\tregisterCashier <firstname> <lastname> <username> <password>"); // done
-        System.out.println("\tregisterCustomer <firstname> <lastname> <username> <address> <password>");
+        System.out.println("\tregisterCustomer <firstname> <lastname> <username> <address> <password>"); // done
         System.out.println("\taddItem <itemName> <categoryName> <unitPrice> <weight> <initialStock>"); // done
         System.out.println("\trestock <itemName> <quantity>"); // done
         System.out.println("\tsetCategoryDiscount <categoryName> <discountPercent>");

@@ -11,60 +11,63 @@ public class Inventory {
         items = new HashMap<>();
         quantities = new HashMap<>();
     }
+
     public void addItem(Item i, int initialStock) throws ItemAlreadyPresentException {
-        if(items.containsKey(i.getName())){
+        if (items.containsKey(i.getName())) {
             throw new ItemAlreadyPresentException(i.getName());
         }
         items.put(i.getName(), i);
         quantities.put(i.getName(), initialStock);
     }
 
-    public boolean hasItem(String itemName){
+    public boolean hasItem(String itemName) {
         return items.containsKey(itemName);
     }
 
     public Item getItem(String itemName) throws NoSuchItemException {
-        if(!items.containsKey(itemName))
+        if (!items.containsKey(itemName))
             throw new NoSuchItemException(itemName);
         return items.get(itemName);
     }
+
     public int getItemStock(String itemName) throws NoSuchItemException {
         // they are always synchronized, no worries
-        if(!items.containsKey(itemName))
+        if (!items.containsKey(itemName))
             throw new NoSuchItemException(itemName);
         return quantities.get(itemName);
     }
+
     public void restock(String itemName, int quantity) throws NoSuchItemException, NegativeRestockingQuantity {
-        if(!items.containsKey(itemName))
+        if (!items.containsKey(itemName))
             throw new NoSuchItemException(itemName);
-        if(quantity<0)
+        if (quantity < 0)
             throw new NegativeRestockingQuantity();
-        quantities.put(itemName, quantities.get(itemName)+quantity);
+        quantities.put(itemName, quantities.get(itemName) + quantity);
     }
 
-    public Set<String> getAllItemNames(){
+    public Set<String> getAllItemNames() {
         return items.keySet();
     }
 
     public void destock(String itemName, int consumedQuantity) throws NoSuchItemException, NegativeDestockingQuantity, NegativeStockQuantity {
-        if(!items.containsKey(itemName))
+        if (!items.containsKey(itemName))
             throw new NoSuchItemException(itemName);
-        if(consumedQuantity<0)
+        if (consumedQuantity < 0)
             throw new NegativeDestockingQuantity();
-        if(quantities.get(itemName)<consumedQuantity)
+        if (quantities.get(itemName) < consumedQuantity)
             throw new NegativeStockQuantity();
-        quantities.put(itemName, quantities.get(itemName)+consumedQuantity);
+        quantities.put(itemName, quantities.get(itemName) - consumedQuantity);
     }
 
     public static class ItemAlreadyPresentException extends Throwable {
         public ItemAlreadyPresentException(String itemName) {
-            super("An item named `"+itemName+"` is already registered.");
+            super("An item named `" + itemName + "` is already registered.");
         }
     }
 
     public static class NoSuchItemException extends Throwable {
         public NoSuchItemException(String itemName) {
-            super("No item named `"+itemName+"` registered.");
+            super("No item named `" + itemName + "` registered.");
         }
     }
 
@@ -75,13 +78,13 @@ public class Inventory {
     }
 
     public static class NegativeDestockingQuantity extends Throwable {
-        public NegativeDestockingQuantity(){
+        public NegativeDestockingQuantity() {
             super("Destocking with negative quantity is not allowed");
         }
     }
 
     public static class NegativeStockQuantity extends Throwable {
-        public NegativeStockQuantity(){
+        public NegativeStockQuantity() {
             super("Negative stock is not allowed, destocking with quantity larger than inventory stock");
         }
     }

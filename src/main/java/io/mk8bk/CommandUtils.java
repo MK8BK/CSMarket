@@ -28,6 +28,20 @@ public class CommandUtils {
             entry("help", CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT),
             entry("quit", CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT)
     );
+    private static final Set<CommandSessionRequirement> managerCompatible = Set.of(
+            CommandSessionRequirement.MANAGER,
+            CommandSessionRequirement.CASHIER_OR_MANAGER,
+            CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT
+    );
+    private static final Set<CommandSessionRequirement> cashierCompatible = Set.of(
+            CommandSessionRequirement.CASHIER,
+            CommandSessionRequirement.CASHIER_OR_MANAGER,
+            CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT
+    );
+    private static final Set<CommandSessionRequirement> loggedOutCompatible = Set.of(
+            CommandSessionRequirement.LOGGED_OUT,
+            CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT
+    );
 
     public static boolean isInvalidCommand(String command) {
         return !commandMap.containsKey(command);
@@ -47,19 +61,4 @@ public class CommandUtils {
         if (isInvalidCommand(command)) return false;
         return loggedOutCompatible.contains(commandMap.get(command));
     }
-
-    private static final Set<CommandSessionRequirement> managerCompatible = Set.of(
-            CommandSessionRequirement.MANAGER,
-            CommandSessionRequirement.CASHIER_OR_MANAGER,
-            CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT
-    );
-    private static final Set<CommandSessionRequirement> cashierCompatible = Set.of(
-            CommandSessionRequirement.CASHIER,
-            CommandSessionRequirement.CASHIER_OR_MANAGER,
-            CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT
-    );
-    private static final Set<CommandSessionRequirement> loggedOutCompatible = Set.of(
-            CommandSessionRequirement.LOGGED_OUT,
-            CommandSessionRequirement.CASHIER_OR_MANAGER_OR_LOGGED_OUT
-    );
 }

@@ -21,14 +21,14 @@ public class UserBase {
     }
 
     public User getUser(String username) throws NoSuchUserException {
-        if(!users.containsKey(username)){
+        if (!users.containsKey(username)) {
             throw new NoSuchUserException(username);
         }
         return users.get(username);
     }
 
     private void addUser(User user) throws UserAlreadyRegisteredException {
-        if(users.containsKey(user.getUsername())){
+        if (users.containsKey(user.getUsername())) {
             throw new UserAlreadyRegisteredException(user.getUsername());
         }
         users.put(user.getUsername(), user);
@@ -40,13 +40,13 @@ public class UserBase {
 
     public static class NoSuchUserException extends Throwable {
         public NoSuchUserException(String username) {
-            super("No user with username `"+username+"` has been registered.");
+            super("No user with username `" + username + "` has been registered.");
         }
     }
 
     public static class UserAlreadyRegisteredException extends Throwable {
         public UserAlreadyRegisteredException(String username) {
-            super("A user with username `"+username+"` has already been registered.");
+            super("A user with username `" + username + "` has already been registered.");
         }
     }
 }

@@ -3,28 +3,12 @@ package io.mk8bk;
 import java.util.Objects;
 
 public class UserSession {
-    private User loggedInUser;
-
-    public boolean isUserLoggedIn() {
-        return userLoggedIn;
-    }
-    public boolean isManagerLoggedIn(){
-        return isUserLoggedIn() && Objects.equals(loggedInUser.getClass(),Manager.class);
-    }
-    public boolean isCashierLoggedIn(){
-        return isUserLoggedIn() && Objects.equals(loggedInUser.getClass(),Cashier.class);
-    }
-
-    private boolean userLoggedIn;
     private final UserBase userBase;
-
-    public User getLoggedInUser(){
-        return loggedInUser;
-    }
-
+    private User loggedInUser;
+    private boolean userLoggedIn;
 
     public UserSession(UserBase userBase) {
-        if(userBase==null){
+        if (userBase == null) {
             throw new RuntimeException("Session needs proper user base.");
         }
         this.userBase = userBase;
@@ -32,12 +16,28 @@ public class UserSession {
         userLoggedIn = false;
     }
 
+    public boolean isUserLoggedIn() {
+        return userLoggedIn;
+    }
+
+    public boolean isManagerLoggedIn() {
+        return isUserLoggedIn() && Objects.equals(loggedInUser.getClass(), Manager.class);
+    }
+
+    public boolean isCashierLoggedIn() {
+        return isUserLoggedIn() && Objects.equals(loggedInUser.getClass(), Cashier.class);
+    }
+
+    public User getLoggedInUser() {
+        return loggedInUser;
+    }
+
     public void login(String username, String password) throws UserAlreadyLoggedInException, UserBase.NoSuchUserException, InvalidPasswordException {
-        if(userLoggedIn){
+        if (userLoggedIn) {
             throw new UserAlreadyLoggedInException();
         }
         User u = userBase.getUser(username);
-        if(!Objects.equals(password, u.getPassword())){
+        if (!Objects.equals(password, u.getPassword())) {
             throw new InvalidPasswordException(username);
         }
         loggedInUser = u;
@@ -45,7 +45,7 @@ public class UserSession {
     }
 
     public void logout() throws NoUserLoggedInException {
-        if(!userLoggedIn){
+        if (!userLoggedIn) {
             throw new NoUserLoggedInException();
         }
         loggedInUser = null;
@@ -59,14 +59,14 @@ public class UserSession {
     }
 
     public static class NoUserLoggedInException extends Throwable {
-        public NoUserLoggedInException(){
-           super("No user is currently logged in.");
+        public NoUserLoggedInException() {
+            super("No user is currently logged in.");
         }
     }
 
     public static class InvalidPasswordException extends Throwable {
         public InvalidPasswordException(String username) {
-            super("Invalid password for user `"+username+"`.");
+            super("Invalid password for user `" + username + "`.");
         }
     }
 }

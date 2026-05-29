@@ -3,20 +3,14 @@ package io.mk8bk;
 import java.util.Objects;
 
 public class Customer {
-    @Override
-    public String toString() {
-        return "Customer{" + "firstname='" + firstname + '\'' + ", lastname='" + lastname + '\'' + ", id=" + id + ", username='" + username + '\'' + ", plan=" + plan + ", address='" + address + '\'' + '}';
-    }
-    // DONE
-
     final public String firstname;
+    // DONE
     final public String lastname;
     final public int id;
     final public String username;
     final public String address;
     final public String password;
     private DiscountPlan plan;
-
     Customer(int id, String firstname, String lastname, String username, String address, String password, DiscountPlan plan) {
         this.lastname = lastname;
         this.id = id;
@@ -29,6 +23,11 @@ public class Customer {
 
     Customer(int id, String firstname, String lastname, String username, String address, String password) {
         this(id, firstname, lastname, password, address, username, new NormalDiscountPlan());
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" + "firstname='" + firstname + '\'' + ", lastname='" + lastname + '\'' + ", id=" + id + ", username='" + username + '\'' + ", plan=" + plan + ", address='" + address + '\'' + '}';
     }
 
     public DiscountPlan getPlan() {

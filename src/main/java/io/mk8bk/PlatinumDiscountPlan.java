@@ -1,12 +1,13 @@
 package io.mk8bk;
 
-public class PlatinumDiscountPlan implements DiscountPlan{
+public class PlatinumDiscountPlan implements DiscountPlan {
     @Override
     public void discount(Cart cart) {
         // TODO: implement
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return "PLATINUM";
     }
 }
