@@ -61,4 +61,116 @@ public class CommandUtils {
         if (isInvalidCommand(command)) return false;
         return loggedOutCompatible.contains(commandMap.get(command));
     }
+
+    public static boolean verifyCommandArguments(String command, String[] arguments) {
+        if (isInvalidCommand(command)) {
+            // dead branch but eh
+            // assume the terminal already eliminated invalid commands
+            throw new RuntimeException("Invalid Command");
+        }
+        if ("login".equals(command)) {
+            if (arguments.length != 2) {
+                System.out.println("Command `login` takes exactly two arguments: <username> <password>");
+                return false;
+            }
+        } else if ("logout".equals(command)) {
+            if (arguments.length != 0) {
+                System.out.println("Command `logout` takes no arguments");
+                return false;
+            }
+        } else if ("registerCashier".equals(command)) {
+            if (arguments.length != 4) {
+                System.out.println(
+                        "Command `registerCashier` takes exactly four arguments: <firstname> <lastname> <username> <password>"
+                );
+                return false;
+            }
+        } else if ("addItem".equals(command)) {
+            if (arguments.length != 5) {
+                System.out.println(
+                        "Command `addItem` takes exactly five arguments: <itemName> <categoryName> <unitPrice> <weight> <initialStock>"
+                );
+                return false;
+            }
+            try {
+                int initialStock = Integer.parseInt(arguments[4]);
+                int weight = Integer.parseInt(arguments[3]);
+                int unitPrice = Integer.parseInt(arguments[2]);
+                if (initialStock < 0 || weight < 0 || unitPrice < 0) {
+                    System.out.println("Arguments <unitPrice> <weight> <initialStock> should be positive integers (centimes, grams, count)");
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Arguments <unitPrice> <weight> <initialStock> should be integers (centimes, grams, count)");
+                return false;
+            }
+        } else if ("scanItem".equals(command)) {
+            if (arguments.length != 2) {
+                System.out.println("Command `scanItem` takes exactly two arguments: <itemName> <quantity>"
+                );
+                return false;
+            }
+            try {
+                int quantity = Integer.parseInt(arguments[1]);
+                if (quantity < 0) {
+                    System.out.println("Argument <quantity> should be a positive integer (count)");
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Argument <quantity> should be an integer (count)");
+                return false;
+            }
+        } else if ("startCheckout".equals(command)) {
+            if (arguments.length != 1) {
+                System.out.println("Command `startCheckout` takes exactly one argument: <customerName>");
+                return false;
+            }
+        } else if ("showInventory".equals(command)) {
+            if (arguments.length != 0) {
+                System.out.println("Command `showInventory` takes no arguments");
+                return false;
+            }
+        } else if ("restock".equals(command)) {
+            if (arguments.length != 2) {
+                System.out.println("Command `restock` takes exactly two arguments: <itemName> <quantity>");
+                return false;
+            }
+            try {
+                int quantity = Integer.parseInt(arguments[1]);
+                if (quantity < 0) {
+                    System.out.println("Argument <quantity> should be a positive integer (count)");
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Argument <quantity> should be an integer (count)");
+                return false;
+            }
+        } else if ("registerCustomer".equals(command)) {
+            if (arguments.length != 5) {
+                System.out.println(
+                        "Command `registerCustomer` takes exactly five arguments: <firstname> <lastname> <username> <address> <password>"
+                );
+                return false;
+            }
+        } else if ("setup".equals(command)) {
+            if (arguments.length != 0) {
+                System.out.println("Command `setup` takes no arguments.");
+                return false;
+            }
+        } else if ("setCategoryDiscount".equals(command)) {
+            if (arguments.length != 2) {
+                System.out.println("Command `setCategoryDiscount` takes exactly 2 arguments: <categoryName> <discountPercent>");
+                return false;
+            }
+            try {
+                int discountPercent = Integer.parseInt(arguments[1]);
+            }catch (NumberFormatException e){
+                System.out.println("Argument <discountPercent> has to be an integer.");
+                return false;
+            }
+        }
+
+
+        return true;
+    }
 }

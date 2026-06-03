@@ -4,11 +4,19 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class SuperMarketCheckoutSystem {
-    static final UserBase userBase = new UserBase();
-    static final UserSession userSession = new UserSession(userBase);
-    static final CustomerBase customerBase = new CustomerBase();
-    static final Inventory inventory = new Inventory();
-    static final CategoryRepository categories = new CategoryRepository();
+    // a user is a cashier or a manager
+    private static final UserBase userBase = new UserBase();
+    // handles the current user session
+    private static final UserSession userSession = new UserSession(userBase);
+    // keeps track of all the registered customers
+    private static final CustomerBase customerBase = new CustomerBase();
+    // keeps track of all registered categories
+    private static final CategoryBase categories = new CategoryBase();
+    // keeps track of the items in the supermarket inventory
+    private static final Inventory inventory = new Inventory();
+
+    // null when not currently serving a customer
+    private static Checkout checkout = null;
 
     public static void main(String[] args) {
         try {
@@ -20,7 +28,7 @@ public class SuperMarketCheckoutSystem {
         handleCLI();
     }
 
-    public static void handleCLI() {
+    private static void handleCLI() {
         Scanner scanner = new Scanner(System.in);
         String input;
         System.out.println("====================================================");
@@ -30,10 +38,8 @@ public class SuperMarketCheckoutSystem {
         while (true) {
             System.out.print("> ");
             input = scanner.nextLine().trim();
-            if (input.isEmpty())
-                continue;
-            if (input.equalsIgnoreCase("quit"))
-                break;
+            if (input.isEmpty()) continue;
+            if (input.equalsIgnoreCase("quit")) break;
             if (input.equalsIgnoreCase("help")) {
                 printHelp();
                 continue;
@@ -68,83 +74,92 @@ public class SuperMarketCheckoutSystem {
                 return;
             }
         }
+        if (!CommandUtils.verifyCommandArguments(command, arguments)) {
+            return;
+        }
         if ("login".equals(command)) {
-            if (arguments.length != 2) {
-                System.out.println("Command `login` takes exactly two arguments: <username> <password>");
-                return;
-            }
             handleLogin(arguments[0], arguments[1]);
         } else if ("logout".equals(command)) {
-            if (arguments.length != 0) {
-                System.out.println("Command `logout` takes no arguments");
-                return;
-            }
             handleLogout();
         } else if ("registerCashier".equals(command)) {
             if (userSession.getLoggedInUser().getClass() != Manager.class) {
                 System.out.println("Only a Manager can register a new cashier.");
                 return;
             }
-            if (arguments.length != 4) {
-                System.out.println(
-                        "Command `registerCashier` takes exactly four arguments: <firstname> <lastname> <username> <password>"
-                );
-                return;
-            }
             handleRegisterCashierCommand(arguments[0], arguments[1], arguments[2], arguments[3]);
         } else if ("addItem".equals(command)) {
-            if (arguments.length != 5) {
-                System.out.println(
-                        "Command `addItem` takes exactly five arguments: <itemName> <categoryName> <unitPrice> <weight> <initialStock>"
-                );
-                return;
-            }
-            try {
-                int initialStock = Integer.parseInt(arguments[4]);
-                int weight = Integer.parseInt(arguments[3]);
-                int unitPrice = Integer.parseInt(arguments[2]);
-                handleAddItem(arguments[0], arguments[1], unitPrice, weight, initialStock);
-            } catch (NumberFormatException e) {
-                System.out.println("Arguments <unitPrice> <weight> <initialStock> should be integers (centimes).");
-            }
-
+            int initialStock = Integer.parseInt(arguments[4]);
+            int weight = Integer.parseInt(arguments[3]);
+            int unitPrice = Integer.parseInt(arguments[2]);
+            handleAddItem(arguments[0], arguments[1], unitPrice, weight, initialStock);
+        } else if ("scanItem".equals(command)) {
+            handleScanItem(arguments[0], arguments[1]);
+        } else if ("startCheckout".equals(command)) {
+            handleStartCheckout(arguments[0]);
         } else if ("showInventory".equals(command)) {
-            if (arguments.length != 0) {
-                System.out.println("Command `showInventory` takes no arguments");
-                return;
-            }
             handleShowInventory();
         } else if ("restock".equals(command)) {
-            if (arguments.length != 2) {
-                System.out.println("Command `restock` takes exactly two arguments: <itemName> <quantity>");
-                return;
-            }
-            try {
-                int quantity = Integer.parseInt(arguments[1]);
-                handleRestock(arguments[0], quantity);
-            } catch (NumberFormatException e) {
-                System.out.println("Argument <quantity> should be an integer.");
-            }
+            int quantity = Integer.parseInt(arguments[1]);
+            handleRestock(arguments[0], quantity);
         } else if ("registerCustomer".equals(command)) {
-            if (arguments.length != 5) {
-                System.out.println(
-                        "Command `registerCustomer` takes exactly five arguments: <firstname> <lastname> <username> <address> <password>"
-                );
-                return;
-            }
             handleRegisterCustomerCommand(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
         } else if ("setup".equals(command)) {
-            if (arguments.length != 0) {
-                System.out.println(
-                        "Command `setup` takes no arguments."
-                );
-            }
+            handleSetup();
+        } else if ("setCategoryDiscount".equals(command)) {
+            int discountPercent = Integer.parseInt(arguments[1]);
+            handleSetCategoryDiscount(arguments[0], discountPercent);
+        }
+    }
+
+    private static void handleSetCategoryDiscount(String categoryName, int discountPercent) {
+        try {
+            categories.setCategoryDiscount(categoryName, discountPercent);
+            System.out.println("Category `" + categoryName + "` has been discounted by " + discountPercent + "%.");
+        } catch (CategoryBase.NoSuchCategoryException e) {
+            System.out.println("No category `" + categoryName + "` registered. addItem with category to register said category.");
+        } catch (CategoryBase.InvalidCategoryDiscountPercent e) {
+            System.out.println("Argument <discountPercent> has to be in the range [0, 100].");
+        }
+    }
+
+    private static void handleScanItem(String itemName, String quantity) {
+        if (checkout == null) {
+            System.out.println("No checkout start, can't scan item.");
+            return;
+        }
+        try {
+            // no error since sanitized in CommandUtils.verifyCommandArguments
+            int q = Integer.parseInt(quantity);
+            Item i = inventory.getItem(itemName);
+            checkout.scanItem(i, q);
+            System.out.println("Scanned: " + i.getName() + " ---- quantity: " + q);
+        } catch (Inventory.NoSuchItemException e) {
+            System.out.println("No such item `" + itemName + "` in inventory.");
+        }
+    }
+
+    private static void handleSetup() {
+        // TODO: do
+    }
+
+    private static void handleStartCheckout(String customerName) {
+        if (checkout != null) {
+            System.out.println("A checkout is ongoing. Can't start another one.");
+            return;
+        }
+        try {
+            Customer c = customerBase.getCustomer(customerName);
+            checkout = new Checkout(c);
+            System.out.println("Checkout started for customer `" + c.firstname + "`.");
+        } catch (CustomerBase.NoSuchCustomerException e) {
+            System.out.println("No such customer `" + customerName + "` currently registered.");
         }
     }
 
     private static void handleRestock(String itemName, int quantity) {
         try {
             inventory.restock(itemName, quantity);
+            System.out.println("Item `" + itemName + "` restocked; current quantity: " + inventory.getItemStock(itemName));
         } catch (Inventory.NoSuchItemException e) {
             System.out.println("Can't restock item `" + itemName + "`, not registered.");
         } catch (Inventory.NegativeRestockingQuantity e) {
@@ -169,14 +184,12 @@ public class SuperMarketCheckoutSystem {
             return;
         }
         try {
-            if (!categories.hasCategory(categoryName)) {
-                categories.addCategory(categoryName);
-            }
+            if (!categories.hasCategory(categoryName)) categories.addCategory(categoryName);
             ItemCategory category = categories.getCategory(categoryName);
             Item i = new Item(itemName, category, unitPrice, weight);
             inventory.addItem(i, initialStock);
             System.out.println("Item `" + i.getName() + "` added to inventory.");
-        } catch (CategoryRepository.NoSuchCategoryException | CategoryRepository.CategoryAlreadyRegisteredException |
+        } catch (CategoryBase.NoSuchCategoryException | CategoryBase.CategoryAlreadyRegisteredException |
                  Inventory.ItemAlreadyPresentException e) {
             // dead branches
         }
@@ -204,7 +217,8 @@ public class SuperMarketCheckoutSystem {
     private static void handleLogout() {
         try {
             userSession.logout();
-            System.out.println("Logout successfull.");
+            checkout = null;
+            System.out.println("Logout successful.");
         } catch (UserSession.NoUserLoggedInException e) {
             // dead branch but eh
             System.out.println("No user logged in, can't logout.");
@@ -235,7 +249,7 @@ public class SuperMarketCheckoutSystem {
     }
 
 
-    static void printHelp() {
+    private static void printHelp() {
         System.out.println("\n\t\tCommands");
         System.out.println("\tlogin <username> <password>"); // done
         System.out.println("\tlogout"); // done
@@ -244,10 +258,10 @@ public class SuperMarketCheckoutSystem {
         System.out.println("\tregisterCustomer <firstname> <lastname> <username> <address> <password>"); // done
         System.out.println("\taddItem <itemName> <categoryName> <unitPrice> <weight> <initialStock>"); // done
         System.out.println("\trestock <itemName> <quantity>"); // done
-        System.out.println("\tsetCategoryDiscount <categoryName> <discountPercent>");
+        System.out.println("\tsetCategoryDiscount <categoryName> <discountPercent>"); // done
         System.out.println("\tsubscribeToPlan <planName>");
-        System.out.println("\tstartCheckout <customerUsername>");
-        System.out.println("\tscanItem <itemName> <quantity>");
+        System.out.println("\tstartCheckout <customerUsername>"); // done
+        System.out.println("\tscanItem <itemName> <quantity>"); // done
         System.out.println("\tcomputeBill");
         System.out.println("\trequestDelivery <address>");
         System.out.println("\tpay <cardNumber> <pin>");

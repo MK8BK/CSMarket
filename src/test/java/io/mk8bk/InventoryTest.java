@@ -9,7 +9,7 @@ class InventoryTest {
     @Test
     void addItem() {
         Inventory inventory = new Inventory();
-        CategoryRepository categoryRepository = new CategoryRepository();
+        CategoryBase categoryBase = new CategoryBase();
         assertDoesNotThrow(() -> {
             Item i = new Item("milk", new ItemCategory("DAIRY"), 200, 1000);
             inventory.addItem(i, 50);

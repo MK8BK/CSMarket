@@ -17,12 +17,12 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item{" +
+        return "Item[" +
                 "name='" + name + '\'' +
                 ", itemCategory='" + itemCategory.categoryName() +
                 "', unitPriceInCentimes=" + unitPriceInCentimes +
                 ", weightPerUnitInGrams=" + weightPerUnitInGrams +
-                '}';
+                ']';
     }
 
     @Override

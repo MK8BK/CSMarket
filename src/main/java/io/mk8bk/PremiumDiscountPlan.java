@@ -2,7 +2,7 @@ package io.mk8bk;
 
 public class PremiumDiscountPlan implements DiscountPlan {
     @Override
-    public void discount(Cart cart) {
+    public void discount(Checkout checkout) {
         // TODO: implement this plan
     }
 
