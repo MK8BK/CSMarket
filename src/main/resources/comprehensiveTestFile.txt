@@ -87,6 +87,7 @@ showInventory
 restock bread 3
 showInventory
 logout
+
 login jafar jasmine
 startCheckout noob
 scanItem milk 50
@@ -97,3 +98,29 @@ logout
 login ceo 123456789
 showInventory
 showRevenue
+logout
+
+login jafar jasmine
+startCheckout noob
+scanItem milk 1
+requestDelivery
+requestDelivery gif-sur-yvette
+computeBill
+pay 1234567812345678 1234
+
+startCheckout noob
+scanItem milk 60
+requestDelivery gif-sur-yvette
+computeBill
+pay 1234567812345678 1234
+
+startCheckout noob
+scanItem milk 20
+computeBill
+pay 1234567812345678 1234
+logout
+login ceo 123456789
+showInventory
+showRevenue
+logout
+quit

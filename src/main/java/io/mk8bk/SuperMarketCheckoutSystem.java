@@ -22,6 +22,8 @@ public class SuperMarketCheckoutSystem {
     private static final PointOfSale pos = new PointOfSale(tas);
     private static boolean setupPerformed = false;
     private static long totalRevenueInCentimes = 0;
+    private static final AddressBookService addressBookService = new RandomAddressBookService();
+    private static final DeliveryHub deliveryHub = new DeliveryHub();
 
     // null when not currently serving a customer
     private static Checkout checkout = null;
@@ -141,7 +143,21 @@ public class SuperMarketCheckoutSystem {
         } else if ("showRevenue".equals(command)) {
             System.out.println(String.format("Total revenue is: %.2f EUR",
                     totalRevenueInCentimes / 100.0));
+        } else if ("requestDelivery".equals(command)) {
+            handleRequestDelivery(arguments[0]);
+        } else{
+            System.out.println("NOT IMPLEMENTED.");
         }
+    }
+
+    private static void handleRequestDelivery(String address) {
+        if(checkout==null){
+            System.out.println("Can't request delivry; startCheckout first.");
+            return;
+        }
+        // for next time
+        deliveryHub.enqueueDelivery(checkout.getCustomer().username, address);
+        System.out.println("Delivery requested for customer "+checkout.getCustomer().username);
     }
 
     private static void handleRunTest(String filePath) {
@@ -183,8 +199,22 @@ public class SuperMarketCheckoutSystem {
             return;
         }
         String bill = checkout.computeBill();
+        String username = checkout.getCustomer().username;
         System.out.println(bill);
+        if(deliveryHub.deliveryIsDue(username)){
+            String address = deliveryHub.getAddress(username);
+            int distance = addressBookService.getDistance(address);
+            try {
+                int deliveryFee = checkout.computeDeliveryFee(distance);
+                System.out.printf("Delivery fee: %.2f EUR\n", deliveryFee/100.0);
+                System.out.printf("New total: %.2f EUR\n", checkout.getTotalInCentimes()/100.0);
+            } catch (Checkout.ImpossibleDelivery e) {
+                System.out.println("Delivery impossible, weight exceeds 50kg.");
+                deliveryHub.cancelDelivery(username);
+            }
+        }
     }
+
 
     private static void handlePay(String cardNumber, String pin) {
         if (checkout == null) {
@@ -201,6 +231,11 @@ public class SuperMarketCheckoutSystem {
             checkout.decrementInventory(inventory);
             totalRevenueInCentimes += amountInCentimes;
             System.out.println("Payment successfull.");
+            String username = checkout.getCustomer().username;
+            if(deliveryHub.deliveryIsDue(username))
+                deliveryHub.deliver(username);
+            deliveryHub.scheduleDelivery(username);
+            checkout = null;
         } catch (TransactionAuthorisationSystem.NoSuchCreditCardException e) {
             System.out.println("No such credit card registered with a bank " + "authority; aborting.");
         } catch (
@@ -208,6 +243,9 @@ public class SuperMarketCheckoutSystem {
             System.out.println("Insufficient bank account balance; aborting " + "payment.");
         } catch (TransactionAuthorisationSystem.InvalidPinException e) {
             System.out.println("Invalid card pin; aborting payment.");
+        } catch (DeliveryHub.UndueDelivery e) {
+            // let it blow up
+            throw new RuntimeException(e);
         }
     }
 
@@ -296,7 +334,7 @@ public class SuperMarketCheckoutSystem {
         try {
             Customer c = customerBase.getCustomer(customerName);
             checkout = new Checkout(c, categories);
-            System.out.println("Checkout started for customer `" + c.firstname + "`.");
+            System.out.println("Checkout started for customer `" + c.username + "`.");
         } catch (CustomerBase.NoSuchCustomerException e) {
             System.out.println("No such customer `" + customerName + "` " +
                     "currently registered.");
@@ -422,7 +460,7 @@ public class SuperMarketCheckoutSystem {
         System.out.println("\n\t\tCommands");
         System.out.println("\tlogin <username> <password>"); // done and tested
         System.out.println("\tlogout"); // done and tested
-        System.out.println("\tsetup"); // done
+        System.out.println("\tsetup"); // done and tested (manual one time test is enough)
         System.out.println("\tregisterCashier <firstname> <lastname> " +
                 "<username> <password>"); // done and tested
         System.out.println("\tregisterCustomer <firstname> <lastname> " +
@@ -433,17 +471,17 @@ public class SuperMarketCheckoutSystem {
         System.out.println("\tsetCategoryDiscount <categoryName> " +
                 "<discountPercent>"); // done and tested
         System.out.println("\tsubscribeToPlan <planName>"); // done and tested
-        System.out.println("\tstartCheckout <customerUsername>"); // done
-        System.out.println("\tscanItem <itemName> <quantity>"); // done
-        System.out.println("\tcomputeBill"); // done
+        System.out.println("\tstartCheckout <customerUsername>"); // done and tested manually (see comprehensiveTestFile)
+        System.out.println("\tscanItem <itemName> <quantity>"); // done and tested manually (see comprehensiveTestFile)
+        System.out.println("\tcomputeBill"); // done and tested manually (see comprehensiveTestFile)
         System.out.println("\trequestDelivery <address>");
         System.out.println("\tpay <cardNumber> <pin>"); // done
-        System.out.println("\tsimulatePayment <outcome>");
-        System.out.println("\tshowInventory"); // done
-        System.out.println("\tshowRevenue");
+        System.out.println("\tsimulatePayment <outcome>"); // not done
+        System.out.println("\tshowInventory"); // done and tested manually (see comprehensiveTestFile)
+        System.out.println("\tshowRevenue"); // done and tested manually (see comprehensiveTestFile)
         System.out.println("\trunTest <testScenario-file>"); // done
-        System.out.println("\thelp"); // done
-        System.out.println("\tquit"); // done
+        System.out.println("\thelp"); // done and tested manually
+        System.out.println("\tquit"); // done and tested manually
         System.out.println("\t all prices are to be entered in centimes, all " +
                 "weights in grams");
     }

@@ -195,7 +195,12 @@ public class CommandUtils {
             }
         } else if ("runTest".equals(command)) {
             if(arguments.length != 1){
-                System.out.println("Command `runTest` takes exactly one argument: <testScenario-file");
+                System.out.println("Command `runTest` takes exactly one argument: <testScenario-file>");
+                return false;
+            }
+        } else if ("requestDelivery".equals(command)) {
+            if(arguments.length != 1){
+                System.out.println("Command `requestDelivery` takes exactly one argument: <address>");
                 return false;
             }
         } else if ("showRevenue".equals(command)) {

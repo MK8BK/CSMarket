@@ -1,6 +1,9 @@
 package io.mk8bk;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CustomerBase {
     private final HashMap<String, Customer> usernameToCustomer;
@@ -16,6 +19,7 @@ public class CustomerBase {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public String toString() {
@@ -53,6 +57,8 @@ public class CustomerBase {
         return usernameToCustomer.get(username);
     }
 
+
+
     public static class CustomerAlreadyRegisteredException extends Throwable {
         public final String username;
 
@@ -68,6 +74,14 @@ public class CustomerBase {
         public NoSuchCustomerException(String username) {
             super("No customer with the username `" + username + "` exists.");
             this.username = username;
+        }
+    }
+
+    public static class NoDeliveryScheduled extends Throwable {
+        public final String customerName;
+        public NoDeliveryScheduled(String customerName) {
+            super("Customer `"+customerName+"` has no scheduled delivery.");
+            this.customerName = customerName;
         }
     }
 }

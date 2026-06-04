@@ -25,7 +25,7 @@ public class Customer {
     }
 
     Customer(int id, String firstname, String lastname, String username, String address, String password) {
-        this(id, firstname, lastname, password, address, username, new NormalDiscountPlan());
+        this(id, firstname, lastname, username, address, password, new NormalDiscountPlan());
     }
 
     @Override
@@ -67,5 +67,6 @@ public class Customer {
     public void resetPlanPayment() {
         this.paidPlanFee = false;
     }
+
 
 }

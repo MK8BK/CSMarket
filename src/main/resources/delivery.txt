@@ -1,0 +1,17 @@
+login ceo 123456789
+setup
+addItem milk DAIRY 120 500 200
+logout
+login jafar jasmine
+
+startCheckout noob
+scanItem milk 1
+requestDelivery gif-sur-yvette
+computeBill
+pay 1234567812345678 1234
+
+startCheckout noob
+scanItem milk 1
+computeBill
+pay 1234567812345678 1234
+
