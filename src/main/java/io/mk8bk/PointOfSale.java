@@ -16,16 +16,23 @@ public class PointOfSale {
             // dead branch (hopefully)
         }
     }
-    public void pay(String cardNumber, String pin) throws TransactionAuthorisationSystem.NoSuchCreditCardException, TransactionAuthorisationSystem.InsufficientBalanceException, TransactionAuthorisationSystem.InvalidPinException {
+    public void pay(String cardNumber, String pin, int amountInCentimes) throws TransactionAuthorisationSystem.NoSuchCreditCardException, TransactionAuthorisationSystem.InsufficientBalanceException, TransactionAuthorisationSystem.InvalidPinException {
         try {
             tas.connect(this);
-            tas.pay(this, cardNumber, pin);
-            tas.disconnect(this);
+            tas.pay(this, cardNumber, pin, amountInCentimes);
         } catch (TransactionAuthorisationSystem.InsufficientBalanceException | TransactionAuthorisationSystem.InvalidPinException | TransactionAuthorisationSystem.NoSuchCreditCardException e) {
             throw e;
-        } catch (TransactionAuthorisationSystem.UnregisteredPosClientException | TransactionAuthorisationSystem.NoSuchPosConnectionException e) {
+        } catch (TransactionAuthorisationSystem.UnregisteredPosClientException | TransactionAuthorisationSystem.NoSuchPosConnectionException | TransactionAuthorisationSystem.PosAlreadyConnectedException e) {
             // catastrophic error, do not catch and let the system collapse into the void that awaits it
             throw new RuntimeException(e);
+        } finally {
+            try {
+                tas.disconnect(this);
+            } catch (
+                    TransactionAuthorisationSystem.NoSuchPosConnectionException |
+                    TransactionAuthorisationSystem.UnregisteredPosClientException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

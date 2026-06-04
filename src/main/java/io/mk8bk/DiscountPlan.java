@@ -1,5 +1,7 @@
 package io.mk8bk;
 
 public interface DiscountPlan {
-    public void discount(Checkout checkout);
+    String getName();
+    void discount(Checkout checkout);
+    int getPlanInitialPrice();
 }

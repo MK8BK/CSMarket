@@ -2,9 +2,9 @@ package io.mk8bk;
 
 public interface TransactionAuthorisationSystem {
     void registerUser(PointOfSale pos) throws PosAlreadyRegisteredException;
-    void connect(PointOfSale pos) throws UnregisteredPosClientException;
+    void connect(PointOfSale pos) throws UnregisteredPosClientException, PosAlreadyConnectedException;
     void disconnect(PointOfSale pos) throws NoSuchPosConnectionException, UnregisteredPosClientException;
-    void pay(PointOfSale pos, String cardNumber, String pin) throws NoSuchCreditCardException, InvalidPinException, InsufficientBalanceException;
+    void pay(PointOfSale pos, String cardNumber, String pin, int amountInCentimes) throws NoSuchCreditCardException, InvalidPinException, InsufficientBalanceException, UnregisteredPosClientException, NoSuchPosConnectionException;
 
 
     class UnregisteredPosClientException extends Exception {
@@ -19,6 +19,14 @@ public interface TransactionAuthorisationSystem {
         public final String posIdentifier;
         public PosAlreadyRegisteredException(String posIdentifier){
             super("A point of sale with identifier `"+posIdentifier+"` has already been registered.");
+            this.posIdentifier = posIdentifier;
+        }
+    }
+
+    class PosAlreadyConnectedException extends Exception {
+        public final String posIdentifier;
+        public PosAlreadyConnectedException(String posIdentifier){
+            super("A point of sale with identifier `"+posIdentifier+"` is already connected.");
             this.posIdentifier = posIdentifier;
         }
     }

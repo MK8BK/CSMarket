@@ -1,0 +1,19 @@
+login ceo 123456789
+setup
+addItem milk DAIRY 120 1000 200
+setCategoryDiscount DAIRY 5
+logout
+login jafar jasmine
+startCheckout noob
+scanItem milk 250
+subscribeToPlan PRIME
+scanItem milk 30
+computeBill
+pay 198823468998764321 6789
+pay 1234678998764321 6i89
+pay 1234678998764321  6789
+pay 9876543223456789 4321
+logout
+login ceo 123456789
+setup
+showInventory

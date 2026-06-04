@@ -11,6 +11,7 @@ public class Customer {
     final public String address;
     final public String password;
     private DiscountPlan plan;
+    private boolean paidPlanFee;
     Customer(int id, String firstname, String lastname, String username, String address, String password, DiscountPlan plan) {
         this.lastname = lastname;
         this.id = id;
@@ -19,6 +20,8 @@ public class Customer {
         this.address = address;
         this.password = password;
         this.plan = plan;
+        if(Objects.equals(plan.getClass(), NormalDiscountPlan.class))
+            paidPlanFee = true;
     }
 
     Customer(int id, String firstname, String lastname, String username, String address, String password) {
@@ -52,4 +55,17 @@ public class Customer {
     public int hashCode() {
         return Objects.hash(firstname, lastname, id, username, address, password, plan);
     }
+
+    public boolean hasPaidPlanFee() {
+        return paidPlanFee;
+    }
+
+    public void payPlanFee() {
+        this.paidPlanFee = true;
+    }
+
+    public void resetPlanPayment() {
+        this.paidPlanFee = false;
+    }
+
 }

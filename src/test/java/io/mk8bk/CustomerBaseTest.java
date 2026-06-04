@@ -59,8 +59,8 @@ class CustomerBaseTest {
         );
         try {
             Customer jafar = base.getCustomer("jafar");
-            base.subscribeToPlan("jafar", new PremiumDiscountPlan());
-            assertEquals(PremiumDiscountPlan.class, jafar.getPlan().getClass());
+            base.subscribeToPlan("jafar", new PrimeDiscountPlan());
+            assertEquals(PrimeDiscountPlan.class, jafar.getPlan().getClass());
         } catch (CustomerBase.NoSuchCustomerException e) {
             // dead branch
             throw new RuntimeException(e);

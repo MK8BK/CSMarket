@@ -168,7 +168,28 @@ public class CommandUtils {
                 System.out.println("Argument <discountPercent> has to be an integer.");
                 return false;
             }
+        } else if ("pay".equals(command)) {
+            if(arguments.length != 2){
+                System.out.println("Command `pay` takes exactly 2 arguments: <cardNumber> <pin>");
+                return false;
+            }
+        } else if ("subscribeToPlan".equals(command)) {
+            if(arguments.length != 1){
+                System.out.println("Command `subscribeToPlan` takes exactly one argument: <planName>");
+                return false;
+            }
+        } else if ("computeBill".equals(command)) {
+            if(arguments.length != 0){
+                System.out.println("Command `computeBill` takes no arguments.");
+                return false;
+            }
+        } else if ("runTest".equals(command)) {
+            if(arguments.length != 1){
+                System.out.println("Command `runTest` takes exactly one argument: <testScenario-file");
+                return false;
+            }
         }
+
 
 
         return true;

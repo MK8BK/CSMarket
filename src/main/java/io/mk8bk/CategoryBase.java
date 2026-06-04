@@ -6,18 +6,12 @@ import java.util.Map;
 public class CategoryBase {
     // for R6b
     private final Map<String, ItemCategory> categories;
+    // 30% discount is registered as 30
     private final Map<String, Integer> categoryDiscounts;
 
     public CategoryBase() {
         categories = new HashMap<>();
         categoryDiscounts = new HashMap<>();
-        try {
-            addCategory("FRUIT_AND_VEGETABLES");
-            addCategory("DAIRY");
-            addCategory("MEAT");
-        } catch (CategoryAlreadyRegisteredException e) {
-            // dead branch
-        }
     }
 
     public void addCategory(String categoryName) throws CategoryAlreadyRegisteredException {

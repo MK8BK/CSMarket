@@ -10,22 +10,22 @@ public class CustomerTest {
     @Test
     public void testToString() {
         Customer customer = new Customer(1, "firstname", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
-        assertEquals("Customer{firstname='firstname', lastname='lastname', id=1, username='username', plan=PREMIUM, address='address'}", customer.toString());
+                "address", "password", new PrimeDiscountPlan());
+        assertEquals("Customer{firstname='firstname', lastname='lastname', id=1, username='username', plan=PRIME, address='address'}", customer.toString());
     }
 
     @Test
     public void testEquals() {
         Customer customer = new Customer(1, "firstname", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
+                "address", "password", new PrimeDiscountPlan());
         Customer customer2 = new Customer(2, "firstname", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
+                "address", "password", new PrimeDiscountPlan());
         assertNotEquals(customer2, customer);
         Customer customer3 = new Customer(1, "firstnamE", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
+                "address", "password", new PrimeDiscountPlan());
         assertNotEquals(customer3, customer);
         Customer customer4 = new Customer(1, "firstname", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
+                "address", "password", new PrimeDiscountPlan());
         assertEquals(customer4, customer);
     }
 
@@ -36,22 +36,22 @@ public class CustomerTest {
     @Test
     public void testGetPlan() {
         Customer customer = new Customer(1, "firstname", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
+                "address", "password", new PrimeDiscountPlan());
         Customer customer2 = new Customer(1, "firstname", "lastname", "username",
                 "address", "password");
-        assertEquals(PremiumDiscountPlan.class, customer.getPlan().getClass());
+        assertEquals(PrimeDiscountPlan.class, customer.getPlan().getClass());
         assertEquals(NormalDiscountPlan.class, customer2.getPlan().getClass());
     }
 
     @Test
     public void testSetPlan() {
         Customer customer = new Customer(1, "firstname", "lastname", "username",
-                "address", "password", new PremiumDiscountPlan());
+                "address", "password", new PrimeDiscountPlan());
         Customer customer2 = new Customer(1, "firstname", "lastname", "username",
                 "address", "password");
         customer.setPlan(new PlatinumDiscountPlan());
-        customer2.setPlan(new PremiumDiscountPlan());
+        customer2.setPlan(new PrimeDiscountPlan());
         assertEquals(PlatinumDiscountPlan.class, customer.getPlan().getClass());
-        assertEquals(PremiumDiscountPlan.class, customer2.getPlan().getClass());
+        assertEquals(PrimeDiscountPlan.class, customer2.getPlan().getClass());
     }
 }
