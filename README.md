@@ -23,3 +23,4 @@ There is a `comprehensiveTestFile.txt` under the `src/main/resources` directory.
 All money quantities entered in need to be in `CENTIMES`. All weights need to be in `GRAMS`.
 
 Three custmer discount plans are provided: `NORMAL`, `PRIME` and `PLATINUM`.
+
