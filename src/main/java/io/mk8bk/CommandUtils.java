@@ -183,9 +183,24 @@ public class CommandUtils {
                 System.out.println("Command `computeBill` takes no arguments.");
                 return false;
             }
+        } else if ("help".equals(command)) {
+            if(arguments.length != 0){
+                System.out.println("Command `help` takes no arguments.");
+                return false;
+            }
+        } else if ("quit".equals(command)) {
+            if(arguments.length != 0){
+                System.out.println("Command `quit` takes no arguments.");
+                return false;
+            }
         } else if ("runTest".equals(command)) {
             if(arguments.length != 1){
                 System.out.println("Command `runTest` takes exactly one argument: <testScenario-file");
+                return false;
+            }
+        } else if ("showRevenue".equals(command)) {
+            if(arguments.length != 0){
+                System.out.println("Command `computeBill` takes no arguments.");
                 return false;
             }
         }

@@ -1,0 +1,99 @@
+loin
+login ceo 1234
+login ceeeo 1234343
+login ceo 123456789
+setup
+setup
+registerCashier cashierFirstname cashierLastname cashierUsername
+registerCashier cashierFirstname cashierLastname cashierUsername cashierPassword
+registerCashier cashierFirstname cashierLastname cashierUsername cashierPassword
+registerCustomer customerFirstname customerLastname customerUsername
+registerCustomer customerFirstname customerLastname customerUsername customerAddress customerPassword
+registerCustomer customerFirstname customerLastname customerUsername customerAddress customerPassword
+addITem milk 500
+addItem milk 500
+addItem milk DAIRY 120 1000 jeff
+addItem milk DAIRY 120 jeff 500
+addItem milk DAIRY jeff 1000 500
+addItem milk DAIRY -1 1000 500
+addItem milk DAIRY 0 -1 500
+addItem milk DAIRY 120 1000 500
+addItem bread BAKERIES 100 450 200
+showInventory 500
+showInventory
+subscribeToPlan PRIME
+restock
+restock milkkkk 500
+restock milk
+restock milk 500
+restock bread 100
+showInventory
+setCategoryDiscount MILK 50
+setCategoryDiscount DAIRY 101
+setCategoryDiscount DAIRY -1
+setCategoryDiscount BAKERIES 20
+startCheckout
+showRevenue 500
+showRevenue
+help 00
+help
+pay dlfjsdkfj sdfkjdf
+logout
+login cashierUsernamedfdfd cashierPassword
+login cashierUsername CashierPassword
+login cashierUsername cashierPassword
+showRevenue
+showInventory
+restock milk 50
+subscribeToPlan bruh
+subscribeToPlan PRIME
+scanITem milk 2
+scanItem milk 2
+computeBill 50
+computeBill
+startCheckout
+help
+startCheckout user
+startCheckout customerUsername
+scanItem milkkk 50
+scanItem milk jeff
+scanItem milk -1
+scanItem milk 1001
+scanItem milk 2
+scanItem brad 5
+scanItem bread 301
+scanItem bread 1
+scanItem bread 200
+subscribeToPlan P
+subscribeToPlan PLATINUM
+showInventory dkfj
+showInventory
+startCheckout
+startCheckout notcustomerUsername
+startCheckout customerUsername
+pay 1234567812345678 1234
+computeBill 50
+computeBill
+pay dfjdkjfk dlfkjsdf
+pay 1234678998764321 dlfkjsdf
+pay 1234678998764321 6789
+pay 1234567812345678 dkfjsdkf
+pay 1234567812345678 1234
+login ceo 123456789
+logout
+login ceo 123456789
+showRevenue
+showInventory
+restock bread 3
+showInventory
+logout
+login jafar jasmine
+startCheckout noob
+scanItem milk 50
+subscribeToPlan PRIME
+computeBill
+pay 1234567812345678 1234
+logout
+login ceo 123456789
+showInventory
+showRevenue

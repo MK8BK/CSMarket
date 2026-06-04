@@ -21,6 +21,7 @@ public class SuperMarketCheckoutSystem {
             new SampleBankTas();
     private static final PointOfSale pos = new PointOfSale(tas);
     private static boolean setupPerformed = false;
+    private static long totalRevenueInCentimes = 0;
 
     // null when not currently serving a customer
     private static Checkout checkout = null;
@@ -39,7 +40,7 @@ public class SuperMarketCheckoutSystem {
 
     private static void handleCLI(Scanner scanner, boolean interactive) {
         String input;
-        if(interactive){
+        if (interactive) {
             System.out.println(
                     "====================================================");
             System.out.println(" Supermarket Cash Register 2026 ");
@@ -48,10 +49,9 @@ public class SuperMarketCheckoutSystem {
             printHelp();
         }
         while (true) {
-            if(interactive)
-                System.out.print("> ");
+            if (interactive) System.out.print("> ");
             input = scanner.nextLine().trim();
-            if(!interactive) System.out.println("> "+input);
+            if (!interactive) System.out.println("> " + input);
             if (input.isEmpty()) continue;
             if (input.equalsIgnoreCase("quit")) break;
             if (input.equalsIgnoreCase("help")) {
@@ -69,26 +69,25 @@ public class SuperMarketCheckoutSystem {
 
     private static void handleCommand(String command, String[] arguments) {
         if (CommandUtils.isInvalidCommand(command)) {
-            System.out.println("Command `" + command + "` is invalid, type " +
-                    "`help` for available commands.");
+            System.out.println("Command `" + command + "` is invalid, type " + "`help` for available commands.");
             return;
         }
         if (userSession.isManagerLoggedIn()) {
             if (!CommandUtils.isManagerCompatible(command)) {
-                System.out.println("Command `" + command + "` is invalid for " +
-                        "the current logged in user (manager).");
+                System.out.println("Command `" + command + "` is invalid for "
+                        + "the current logged in user (manager).");
                 return;
             }
         } else if (userSession.isCashierLoggedIn()) {
             if (!CommandUtils.isCashierCompatible(command)) {
-                System.out.println("Command `" + command + "` is invalid for " +
-                        "the current logged in user (cashier).");
+                System.out.println("Command `" + command + "` is invalid for "
+                        + "the current logged in user (cashier).");
                 return;
             }
         } else { // no user logged in
             if (!CommandUtils.isLoggedOutCompatible(command)) {
-                System.out.println("Command `" + command + "` is invalid for " +
-                        "the current user (not logged in).");
+                System.out.println("Command `" + command + "` is invalid for "
+                        + "the current user (not logged in).");
                 return;
             }
         }
@@ -101,8 +100,8 @@ public class SuperMarketCheckoutSystem {
             handleLogout();
         } else if ("registerCashier".equals(command)) {
             if (userSession.getLoggedInUser().getClass() != Manager.class) {
-                System.out.println("Only a Manager can register a new cashier" +
-                        ".");
+                System.out.println("Only a Manager can register a new " +
+                        "cashier" + ".");
                 return;
             }
             handleRegisterCashierCommand(arguments[0], arguments[1],
@@ -139,9 +138,10 @@ public class SuperMarketCheckoutSystem {
             handleSubscribeToPlan(arguments[0]);
         } else if ("runTest".equals(command)) {
             handleRunTest(arguments[0]);
+        } else if ("showRevenue".equals(command)) {
+            System.out.println(String.format("Total revenue is: %.2f EUR",
+                    totalRevenueInCentimes / 100.0));
         }
-
-
     }
 
     private static void handleRunTest(String filePath) {
@@ -150,9 +150,9 @@ public class SuperMarketCheckoutSystem {
             Scanner scanner = new Scanner(f);
             handleCLI(scanner, false);
         } catch (FileNotFoundException e) {
-            System.out.println("File `"+filePath+"` not found.");
+            System.out.println("File `" + filePath + "` not found.");
             return;
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             return;
         }
     }
@@ -169,8 +169,7 @@ public class SuperMarketCheckoutSystem {
         } else if ("PLATINUM".equals(planName)) {
             checkout.subscribeToPlan(new PlatinumDiscountPlan());
         } else {
-            System.out.println("`" + planName + "` is not a valid plan name " +
-                    "{NORMAL, PRIME, PLATINUM}.");
+            System.out.println("`" + planName + "` is not a valid plan name " + "{NORMAL, PRIME, PLATINUM}.");
             return;
         }
         System.out.println("Customer `" + checkout.getCustomer().username +
@@ -184,7 +183,7 @@ public class SuperMarketCheckoutSystem {
             return;
         }
         String bill = checkout.computeBill();
-        System.out.println(String.format("[%s]", bill));
+        System.out.println(bill);
     }
 
     private static void handlePay(String cardNumber, String pin) {
@@ -200,14 +199,13 @@ public class SuperMarketCheckoutSystem {
         try {
             pos.pay(cardNumber, pin, amountInCentimes);
             checkout.decrementInventory(inventory);
+            totalRevenueInCentimes += amountInCentimes;
             System.out.println("Payment successfull.");
         } catch (TransactionAuthorisationSystem.NoSuchCreditCardException e) {
-            System.out.println("No such credit card registered with a bank " +
-                    "authority; aborting.");
+            System.out.println("No such credit card registered with a bank " + "authority; aborting.");
         } catch (
                 TransactionAuthorisationSystem.InsufficientBalanceException e) {
-            System.out.println("Insufficient bank account balance; aborting " +
-                    "payment.");
+            System.out.println("Insufficient bank account balance; aborting " + "payment.");
         } catch (TransactionAuthorisationSystem.InvalidPinException e) {
             System.out.println("Invalid card pin; aborting payment.");
         }
@@ -221,11 +219,10 @@ public class SuperMarketCheckoutSystem {
             System.out.println("Category `" + categoryName + "` has been " +
                     "discounted by " + discountPercent + "%.");
         } catch (CategoryBase.NoSuchCategoryException e) {
-            System.out.println("No category `" + categoryName + "` registered" +
-                    ". addItem with category to register said category.");
+            System.out.println("No category `" + categoryName + "` registered"
+                    + ". addItem with category to register said category.");
         } catch (CategoryBase.InvalidCategoryDiscountPercent e) {
-            System.out.println("Argument <discountPercent> has to be in the " +
-                    "range [0, 100].");
+            System.out.println("Argument <discountPercent> has to be in the " + "range [0, 100].");
         }
     }
 
@@ -239,16 +236,21 @@ public class SuperMarketCheckoutSystem {
             int q = Integer.parseInt(quantity);
             Item i = inventory.getItem(itemName);
             int totalQuantity = inventory.getItemStock(itemName);
-            if(totalQuantity<q){
+            if (totalQuantity < q) {
                 System.out.println("Not enough inventory.");
                 return;
             }
             checkout.scanItem(i, q);
-            System.out.println(String.format("Scanned: %-30s quantity: %-6d price: %-6.2f EUR", itemName, q, q*i.getUnitPriceInCentimes()/100.0));
+            System.out.println(String.format("Scanned: %-30s quantity: %-6d " +
+                    "price: %-6.2f EUR", itemName, q,
+                    q * i.getUnitPriceInCentimes() / 100.0));
             String categoryName = i.getItemCategory().categoryName();
             int discount = categories.getCategoryDiscount(categoryName);
-            if(0 != discount){
-                System.out.println(String.format("%-30s items have a %d%% discount applied: -%-6.2f EUR", categoryName, discount, i.getUnitPriceInCentimes()*discount*q/10000.0f));
+            if (0 != discount) {
+                System.out.println(String.format("%-30s items have a %d%% " +
+                        "discount applied: -%-6.2f EUR", categoryName,
+                        discount,
+                        i.getUnitPriceInCentimes() * discount * q / 10000.0f));
             }
             System.out.flush();
         } catch (Inventory.NoSuchItemException e) {
@@ -288,8 +290,7 @@ public class SuperMarketCheckoutSystem {
 
     private static void handleStartCheckout(String customerName) {
         if (checkout != null) {
-            System.out.println("A checkout is ongoing. Can't start another " +
-                    "one.");
+            System.out.println("A checkout is ongoing. Can't start another " + "one.");
             return;
         }
         try {
@@ -305,11 +306,9 @@ public class SuperMarketCheckoutSystem {
     private static void handleRestock(String itemName, int quantity) {
         try {
             inventory.restock(itemName, quantity);
-            System.out.println("Item `" + itemName + "` restocked; current " +
-                    "quantity: " + inventory.getItemStock(itemName));
+            System.out.println("Item `" + itemName + "` restocked; current " + "quantity: " + inventory.getItemStock(itemName));
         } catch (Inventory.NoSuchItemException e) {
-            System.out.println("Can't restock item `" + itemName + "`, not " +
-                    "registered.");
+            System.out.println("Can't restock item `" + itemName + "`, not " + "registered.");
         } catch (Inventory.NegativeRestockingQuantity e) {
             System.out.println("Cannot restock with negative value: " + quantity + ".");
         }
@@ -319,8 +318,8 @@ public class SuperMarketCheckoutSystem {
         System.out.println("Inventory");
         for (String itemName : inventory.getAllItemNames()) {
             try {
-                System.out.println("\t\t" + inventory.getItem(itemName) + "\t" +
-                        "\t" + inventory.getItemStock(itemName));
+                System.out.println("\t\t" + inventory.getItem(itemName) + "\t"
+                        + "\t" + inventory.getItemStock(itemName));
             } catch (Inventory.NoSuchItemException e) {
                 // dead branch
             }
@@ -331,8 +330,8 @@ public class SuperMarketCheckoutSystem {
                                       int unitPrice, int weight,
                                       int initialStock) {
         if (inventory.hasItem(itemName)) {
-            System.out.println("Item `" + itemName + "` is already registered" +
-                    " in the inventory.");
+            System.out.println("Item `" + itemName + "` is already " +
+                    "registered" + " in the inventory.");
             return;
         }
         try {
@@ -341,8 +340,8 @@ public class SuperMarketCheckoutSystem {
             ItemCategory category = categories.getCategory(categoryName);
             Item i = new Item(itemName, category, unitPrice, weight);
             inventory.addItem(i, initialStock);
-            System.out.println("Item `" + i.getName() + "` added to inventory" +
-                    ".");
+            System.out.println("Item `" + i.getName() + "` added to " +
+                    "inventory" + ".");
         } catch (CategoryBase.NoSuchCategoryException |
                  CategoryBase.CategoryAlreadyRegisteredException |
                  Inventory.ItemAlreadyPresentException e) {
@@ -359,8 +358,7 @@ public class SuperMarketCheckoutSystem {
             System.out.println("Cashier `" + username + "` successfully " +
                     "registered.");
         } catch (UserBase.UserAlreadyRegisteredException e) {
-            System.out.println("A user with the username `" + username + "` " +
-                    "is already registered.");
+            System.out.println("A user with the username `" + username + "` " + "is already registered.");
         }
     }
 
@@ -375,8 +373,8 @@ public class SuperMarketCheckoutSystem {
             System.out.println("Customer `" + username + "` registered " +
                     "successfully");
         } catch (CustomerBase.CustomerAlreadyRegisteredException e) {
-            System.out.println("Customer with username `" + username + "` is " +
-                    "already registered.");
+            System.out.println("Customer with username `" + username + "` is "
+                    + "already registered.");
         }
     }
 
@@ -412,30 +410,29 @@ public class SuperMarketCheckoutSystem {
         } catch (UserSession.UserAlreadyLoggedInException e) {
             System.out.println("A user is already logged in (" + userSession.getLoggedInUser().getUsername() + "). Logout first.");
         } catch (UserBase.NoSuchUserException e) {
-            System.out.println("No user with username `" + username + "` is " +
-                    "registered. Register first.");
+            System.out.println("No user with username `" + username + "` is " + "registered. Register first.");
         } catch (UserSession.InvalidPasswordException e) {
-            System.out.println("Invalid password for user `" + username + "`." +
-                    " Try again.");
+            System.out.println("Invalid password for user `" + username + "`" +
+                    "." + " Try again.");
         }
     }
 
 
     private static void printHelp() {
         System.out.println("\n\t\tCommands");
-        System.out.println("\tlogin <username> <password>"); // done
-        System.out.println("\tlogout"); // done
+        System.out.println("\tlogin <username> <password>"); // done and tested
+        System.out.println("\tlogout"); // done and tested
         System.out.println("\tsetup"); // done
         System.out.println("\tregisterCashier <firstname> <lastname> " +
-                "<username> <password>"); // done
+                "<username> <password>"); // done and tested
         System.out.println("\tregisterCustomer <firstname> <lastname> " +
-                "<username> <address> <password>"); // done
-        System.out.println("\taddItem <itemName> <categoryName> <unitPrice> " +
-                "<weight> <initialStock>"); // done
-        System.out.println("\trestock <itemName> <quantity>"); // done
+                "<username> <address> <password>"); // done and tested
+        System.out.println("\taddItem <itemName> <categoryName> <unitPrice> " + "<weight> <initialStock>"); // done and tested
+        System.out.println("\trestock <itemName> <quantity>"); // done and
+        // tested
         System.out.println("\tsetCategoryDiscount <categoryName> " +
-                "<discountPercent>"); // done
-        System.out.println("\tsubscribeToPlan <planName>"); // done
+                "<discountPercent>"); // done and tested
+        System.out.println("\tsubscribeToPlan <planName>"); // done and tested
         System.out.println("\tstartCheckout <customerUsername>"); // done
         System.out.println("\tscanItem <itemName> <quantity>"); // done
         System.out.println("\tcomputeBill"); // done
@@ -447,6 +444,8 @@ public class SuperMarketCheckoutSystem {
         System.out.println("\trunTest <testScenario-file>"); // done
         System.out.println("\thelp"); // done
         System.out.println("\tquit"); // done
+        System.out.println("\t all prices are to be entered in centimes, all " +
+                "weights in grams");
     }
 
 }
