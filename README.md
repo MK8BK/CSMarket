@@ -24,3 +24,11 @@ All money quantities entered in need to be in `CENTIMES`. All weights need to be
 
 Three custmer discount plans are provided: `NORMAL`, `PRIME` and `PLATINUM`.
 
+REQUIRES JAVA 25
+
+to run: go to the `out` directory and use a java version 25 to run
+
+```bash 
+# for example
+.jdks/temurin-25.0.3/bin/java -jar CSMarket.jar
+```
